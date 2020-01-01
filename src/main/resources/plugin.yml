@@ -1,0 +1,10 @@
+name: ClientStatsSaver
+main: com.ishland.ClientStatsSaver.BukkitPlugin
+version: ${project.version}
+description: 'A plugin that saves the data for ClientStats'
+depend:
+- ClientStats
+loadbefore:
+- ClientStats
+authors:
+- ishland

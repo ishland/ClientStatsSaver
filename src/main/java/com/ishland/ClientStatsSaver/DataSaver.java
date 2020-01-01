@@ -1,14 +1,14 @@
 package com.ishland.ClientStatsSaver;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-
-import org.yaml.snakeyaml.Yaml;
 
 import com.ishland.ClientStatsSaver.injector.CSUtils;
 import com.ishland.ClientStatsSaver.injector.exception.CSOperationException;
@@ -27,23 +27,23 @@ public class DataSaver {
 	    IllegalAccessException {
 	if (!isInited)
 	    return;
-	FileWriter writer = new FileWriter(dataFile);
-	new Yaml().dump(CSUtils.serialize(), writer);
+	FileOutputStream fileOut = new FileOutputStream(dataFile);
+	ObjectOutputStream out = new ObjectOutputStream(fileOut);
+	out.writeObject(CSUtils.serialize());
+	out.close();
+	fileOut.close();
     }
 
     @SuppressWarnings("unchecked")
     public static void load() throws IOException, IllegalArgumentException,
-	    IllegalAccessException, CSOperationException {
+	    IllegalAccessException, CSOperationException,
+	    ClassNotFoundException {
 	if (!isInited)
 	    return;
-	FileReader reader = new FileReader(dataFile);
-	try {
-	    if (!CSUtils.deserialize(true,
-		    (Map<String, Object>) new Yaml().load(reader)))
-		throw new CSOperationException();
-	} catch (ClassCastException e) {
-	    throw new IllegalArgumentException(e);
-	}
-	reader.close();
+	FileInputStream fileIn = new FileInputStream(dataFile);
+	ObjectInputStream in = new ObjectInputStream(fileIn);
+	CSUtils.deserialize(true, (Map<String, Object>) in.readObject());
+	in.close();
+	fileIn.close();
     }
 }

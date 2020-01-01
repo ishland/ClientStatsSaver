@@ -24,7 +24,7 @@ public class BukkitPlugin extends JavaPlugin implements Listener {
     @Override
     public void onLoad() {
 	this.getDataFolder().mkdirs();
-	dataFile = new File(this.getDataFolder() + File.separator + "data.yml");
+	dataFile = new File(this.getDataFolder() + File.separator + "data.dat");
     }
 
     @Override

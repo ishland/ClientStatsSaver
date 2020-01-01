@@ -17,7 +17,6 @@ public class SaveTask implements Runnable {
 
     @Override
     public void run() {
-	Bukkit.getLogger().info("[ClientStatsSaver] Saving data...");
 	try {
 	    DataSaver.save();
 	} catch (Exception e) {

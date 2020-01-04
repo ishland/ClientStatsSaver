@@ -1,0 +1,8 @@
+name: ClientStatsSaver
+main: com.ishland.ClientStatsSaver.BungeePlugin
+version: ${project.version}
+description: 'A plugin that saves the data for ClientStats'
+depend:
+- ClientStats
+authors:
+- ishland

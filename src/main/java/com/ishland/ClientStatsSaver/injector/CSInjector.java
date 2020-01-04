@@ -70,10 +70,10 @@ public class CSInjector {
 
 	// Try to disable Java Security
 	try {
-	    System.class.getDeclaredField("security").setAccessible(true);
-	    System.class.getDeclaredField("security").set(
-		    System.class.getDeclaredField("security").get(System.class),
-		    null);
+	    Class.forName("java.lang.System").getDeclaredField("security")
+		    .setAccessible(true);
+	    Class.forName("java.lang.System").getDeclaredField("security")
+		    .set(null, null);
 	} catch (Exception e) {
 	    System.out.println(
 		    "[ClientStatsSaver] Error while disabling Java Security "

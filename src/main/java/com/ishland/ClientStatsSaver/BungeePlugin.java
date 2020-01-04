@@ -1,14 +1,12 @@
 package com.ishland.ClientStatsSaver;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bstats.bungeecord.Metrics;
 
 import com.ishland.ClientStatsSaver.injector.CSInjector;
 import com.ishland.ClientStatsSaver.injector.CSUtils;
@@ -16,8 +14,9 @@ import com.ishland.ClientStatsSaver.injector.exception.CSOperationException;
 
 import fr.onecraft.clientstats.ClientStats;
 import fr.onecraft.clientstats.common.core.AbstractAPI;
+import net.md_5.bungee.api.plugin.Plugin;
 
-public class BukkitPlugin extends JavaPlugin implements Listener {
+public class BungeePlugin extends Plugin {
 
     private boolean isInited = false;
     private File dataFile = null;
@@ -32,21 +31,18 @@ public class BukkitPlugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
 	this.setMetric(new Metrics(this));
-	Bukkit.getPluginManager().registerEvents(this, this);
-	this.getLogger().info("Waiting for ClientStats...");
-	if (Bukkit.getPluginManager().isPluginEnabled("ClientStats"))
-	    this.inject();
+	new Timer().schedule(new TimerTask() {
+	    @Override
+	    public void run() {
+		getLogger().info("Waiting for ClientStats...");
+		if (ClientStats.getApi() != null) {
+		    inject();
+		    this.cancel();
+		}
+	    }
+	}, 0, 1000);
     }
 
-    @Override
-    public void onDisable() {
-	if (!this.isInited)
-	    return;
-	this.isInited = false;
-	new SaveTask(dataFile).run();
-    }
-
-    @SuppressWarnings("deprecation")
     public void inject() {
 	if (this.isInited)
 	    return;
@@ -56,7 +52,7 @@ public class BukkitPlugin extends JavaPlugin implements Listener {
 	} catch (CSOperationException e) {
 	    this.getLogger().log(Level.SEVERE,
 		    "Error while injecting ClientStats", e);
-	    Bukkit.getPluginManager().disablePlugin(this, true);
+	    this.onDisable();
 	}
 	DataSaver.init(dataFile);
 	if (dataFile.length() == 0) {
@@ -66,7 +62,7 @@ public class BukkitPlugin extends JavaPlugin implements Listener {
 	    } catch (Exception e) {
 		this.getLogger().log(Level.SEVERE,
 			"Error while preparing data storage", e);
-		Bukkit.getPluginManager().disablePlugin(this, true);
+		this.onDisable();
 	    }
 	}
 	try {
@@ -74,22 +70,23 @@ public class BukkitPlugin extends JavaPlugin implements Listener {
 	} catch (Exception e) {
 	    this.getLogger().log(Level.SEVERE,
 		    "Error while preparing data storage", e);
-	    Bukkit.getPluginManager().disablePlugin(this, true);
+	    this.onDisable();
 	}
 	try {
 	    System.out.println(CSUtils.serialize());
 	} catch (Exception e) {
 	}
 	this.isInited = true;
-	Bukkit.getScheduler().scheduleAsyncRepeatingTask(this,
-		new SaveTask(dataFile), 0, 60 * 20);
+	this.getProxy().getScheduler().schedule(this, new SaveTask(dataFile), 0,
+		60, TimeUnit.SECONDS);
     }
 
-    @EventHandler
-    public void onPluginEnable(PluginEnableEvent event) {
-	if (!event.getPlugin().getName().equals("ClientStats"))
+    @Override
+    public void onDisable() {
+	if (!this.isInited)
 	    return;
-	this.inject();
+	this.isInited = false;
+	new SaveTask(dataFile).run();
     }
 
     /**
@@ -105,4 +102,5 @@ public class BukkitPlugin extends JavaPlugin implements Listener {
     public void setMetric(Metrics metric) {
 	this.metric = metric;
     }
+
 }

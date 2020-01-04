@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ishland</groupId>
 	<artifactId>ClientStatsSaver</artifactId>
-	<version>0.0.2</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>ClientStatsSaver</name>
@@ -19,6 +19,17 @@
 			<id>papermc</id>
 			<url>https://papermc.io/repo/repository/maven-public/</url>
 		</repository>
+		<!-- BungeeCord -->
+		<repository>
+			<id>bungeecord-repo</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+		<!-- CodeMC -->
+		<repository>
+			<id>CodeMC</id>
+			<url>https://repo.codemc.org/repository/maven-public</url>
+		</repository>
+		<!-- GitHub Repository -->
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
@@ -30,13 +41,32 @@
 		<dependency>
 			<groupId>com.destroystokyo.paper</groupId>
 			<artifactId>paper-api</artifactId>
-			<version>1.14.4-R0.1-SNAPSHOT</version>
+			<version>1.15.1-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- BungeeCord API -->
+		<dependency>
+			<groupId>net.md-5</groupId>
+			<artifactId>bungeecord-api</artifactId>
+			<version>1.15-SNAPSHOT</version>
+		</dependency>
+		<!-- ClientStats -->
 		<dependency>
 			<groupId>com.github.ishlandbukkit</groupId>
 			<artifactId>ClientStats</artifactId>
 			<version>b1b34a49ab</version>
+		</dependency>
+		<!-- bStats Bukkit -->
+		<dependency>
+			<groupId>org.bstats</groupId>
+			<artifactId>bstats-bukkit</artifactId>
+			<version>1.5</version>
+		</dependency>
+		<!-- bStats BungeeCord -->
+		<dependency>
+			<groupId>org.bstats</groupId>
+			<artifactId>bstats-bungeecord</artifactId>
+			<version>1.5</version>
 		</dependency>
 	</dependencies>
 
@@ -71,8 +101,30 @@
 						<excludes>
 							<exclude>com.github.ishlandbukkit:ClientStats</exclude>
 							<exclude>com.destroystokyo.paper:paper-api</exclude>
+							<exclude>com.google.guava:guava</exclude>
+							<exclude>com.google.code.gson:gson</exclude>
+							<exclude>net.md-5:bungeecord-chat</exclude>
+							<exclude>net.md-5:bungeecord-api</exclude>
+							<exclude>net.md-5:bungeecord-config</exclude>
+							<exclude>net.md-5:bungeecord-event</exclude>
+							<exclude>net.md-5:bungeecord-protocol</exclude>
+							<exclude>net.md-5:brigadier</exclude>
+							<exclude>org.yaml:snakeyaml</exclude>
+							<exclude>io.netty:netty-codec</exclude>
+							<exclude>io.netty:netty-common</exclude>
+							<exclude>io.netty:netty-buffer</exclude>
+							<exclude>io.netty:netty-transport</exclude>
+							<exclude>io.netty:netty-resolver</exclude>
+							<exclude>net.sf.trove4j:core</exclude>
 						</excludes>
 					</artifactSet>
+					<relocations>
+						<relocation>
+							<pattern>org.bstats</pattern>
+							<!-- Replace this with your package! -->
+							<shadedPattern>com.ishland.ClientStatsSaver.bstats</shadedPattern>
+						</relocation>
+					</relocations>
 					<!-- <filters> <filter> <artifact>*:*</artifact> <excludes> <exclude>META-INF/</exclude> 
 						<exclude>javax/annotation/**</exclude> </excludes> </filter> </filters> -->
 				</configuration>
